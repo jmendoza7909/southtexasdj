@@ -217,17 +217,55 @@
     document.getElementById('nav-' + navId).classList.add('active');
     window.scrollTo(0, 0);
   }
-  function submitForm() {
+  async function submitForm() {
     const first = document.getElementById('f-first').value.trim();
+    const last = document.getElementById('f-last').value.trim();
     const email = document.getElementById('f-email').value.trim();
+    const phone = document.getElementById('f-phone').value.trim();
     const date = document.getElementById('f-date').value;
     const type = document.getElementById('f-type').value;
+    const guests = document.getElementById('f-guests').value.trim();
+    const venue = document.getElementById('f-venue').value.trim();
+    const notes = document.getElementById('f-notes').value.trim();
+
     if (!first || !email || !date || !type) {
       alert('Please fill in your name, email, event date, and event type.');
       return;
     }
-    document.getElementById('book-form').style.display = 'none';
-    document.getElementById('success-box').style.display = 'block';
+
+    const submitBtn = document.querySelector('#book-form .cta-btn');
+    submitBtn.textContent = 'Sending...';
+    submitBtn.disabled = true;
+
+    try {
+      const res = await fetch('https://formspree.io/f/mvzwvjla', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+        body: JSON.stringify({
+          name: first + ' ' + last,
+          email: email,
+          phone: phone,
+          event_date: date,
+          event_type: type,
+          guests: guests,
+          venue: venue,
+          notes: notes
+        })
+      });
+
+      if (res.ok) {
+        document.getElementById('book-form').style.display = 'none';
+        document.getElementById('success-box').style.display = 'block';
+      } else {
+        alert('Something went wrong. Please try again or call (956) 249-0866.');
+        submitBtn.textContent = 'Send Inquiry';
+        submitBtn.disabled = false;
+      }
+    } catch (err) {
+      alert('Something went wrong. Please try again or call (956) 249-0866.');
+      submitBtn.textContent = 'Send Inquiry';
+      submitBtn.disabled = false;
+    }
   }
 </script>
 </body>
